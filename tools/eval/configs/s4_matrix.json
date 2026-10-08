@@ -1,0 +1,24 @@
+{
+  "_comment": "Matriks S4. 'cpu4' mensimulasikan tier hemat secara kasar (4 thread CPU); CPU i7-13620H jauh lebih cepat dari laptop 2019-2021, jadi angka ini OPTIMISTIS untuk tier hemat sampai diuji di mesin 8 GB nyata. 'vk' = Vulkan pada iGPU Intel UHD (tier standar).",
+  "engines": [
+    {"name": "whisper-small-q8-cpu4", "kind": "transcribe_cpp", "model": "whisper-small/whisper-small-Q8_0.gguf", "backend": "cpu", "threads": 4},
+    {"name": "whisper-medium-q5-cpu4", "kind": "transcribe_cpp", "model": "whisper-medium/whisper-medium-Q5_K_M.gguf", "backend": "cpu", "threads": 4},
+    {"name": "whisper-turbo-q5-cpu4", "kind": "transcribe_cpp", "model": "whisper-large-v3-turbo/whisper-large-v3-turbo-Q5_K_M.gguf", "backend": "cpu", "threads": 4},
+    {"name": "qwen3-0.6b-q8-cpu4", "kind": "transcribe_cpp", "model": "qwen3-asr-0.6b/Qwen3-ASR-0.6B-Q8_0.gguf", "backend": "cpu", "threads": 4},
+    {"name": "qwen3-1.7b-q5-cpu4", "kind": "transcribe_cpp", "model": "qwen3-asr-1.7b/Qwen3-ASR-1.7B-Q5_K_M.gguf", "backend": "cpu", "threads": 4},
+
+    {"name": "whisper-turbo-q5-cpu", "kind": "transcribe_cpp", "model": "whisper-large-v3-turbo/whisper-large-v3-turbo-Q5_K_M.gguf", "backend": "cpu", "threads": 0},
+    {"name": "qwen3-1.7b-q5-cpu", "kind": "transcribe_cpp", "model": "qwen3-asr-1.7b/Qwen3-ASR-1.7B-Q5_K_M.gguf", "backend": "cpu", "threads": 0},
+
+    {"name": "whisper-turbo-q5-vk", "kind": "transcribe_cpp", "model": "whisper-large-v3-turbo/whisper-large-v3-turbo-Q5_K_M.gguf", "backend": "vulkan"},
+    {"name": "whisper-turbo-q8-vk", "kind": "transcribe_cpp", "model": "whisper-large-v3-turbo/whisper-large-v3-turbo-Q8_0.gguf", "backend": "vulkan"},
+    {"name": "whisper-large-v3-q5-vk", "kind": "transcribe_cpp", "model": "whisper-large-v3/whisper-large-v3-Q5_K_M.gguf", "backend": "vulkan"},
+    {"name": "qwen3-0.6b-q8-vk", "kind": "transcribe_cpp", "model": "qwen3-asr-0.6b/Qwen3-ASR-0.6B-Q8_0.gguf", "backend": "vulkan"},
+    {"name": "qwen3-1.7b-q5-vk", "kind": "transcribe_cpp", "model": "qwen3-asr-1.7b/Qwen3-ASR-1.7B-Q5_K_M.gguf", "backend": "vulkan"},
+
+    {"name": "whisper-turbo-q5-auto-vk", "kind": "transcribe_cpp", "model": "whisper-large-v3-turbo/whisper-large-v3-turbo-Q5_K_M.gguf", "backend": "vulkan", "language_mode": "auto"},
+    {"name": "qwen3-1.7b-q5-auto-vk", "kind": "transcribe_cpp", "model": "qwen3-asr-1.7b/Qwen3-ASR-1.7B-Q5_K_M.gguf", "backend": "vulkan", "language_mode": "auto"},
+
+    {"name": "wcpp-turbo-q5-cpu4", "kind": "whisper_cpp_cli", "model": "whisper.cpp-ggml/ggml-large-v3-turbo-q5_0.bin", "backend": "cpu", "threads": 4}
+  ]
+}

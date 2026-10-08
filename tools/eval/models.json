@@ -1,0 +1,17 @@
+{
+  "_comment": "Katalog unduhan spike S4. Ukuran dari API Hugging Face/GitHub (dicek 2026-10-08). SHA-256 diverifikasi saat unduh dan dicatat di .data/models/lock.json.",
+  "items": [
+    {"name": "silero-vad", "group": "base", "url": "https://raw.githubusercontent.com/snakers4/silero-vad/v6.2.3/src/silero_vad/data/silero_vad.onnx", "file": "silero_vad.onnx", "size_mb": 2, "license": "MIT"},
+    {"name": "whisper.cpp", "group": "base", "url": "https://github.com/ggml-org/whisper.cpp/releases/download/b5454/whisper-bin-x64.zip", "file": "whisper-bin-x64.zip", "unzip_to": "bin/whisper.cpp", "size_mb": 5, "license": "MIT"},
+
+    {"name": "whisper-small", "group": "s4", "hf_repo": "handy-computer/whisper-small-gguf", "file": "whisper-small-Q8_0.gguf", "size_mb": 270, "license": "MIT"},
+    {"name": "whisper-medium", "group": "s4", "hf_repo": "handy-computer/whisper-medium-gguf", "file": "whisper-medium-Q5_K_M.gguf", "size_mb": 583, "license": "MIT"},
+    {"name": "whisper-large-v3-turbo", "group": "s4", "hf_repo": "handy-computer/whisper-large-v3-turbo-gguf", "file": "whisper-large-v3-turbo-Q5_K_M.gguf", "size_mb": 620, "license": "MIT"},
+    {"name": "whisper-large-v3-turbo", "group": "s4", "hf_repo": "handy-computer/whisper-large-v3-turbo-gguf", "file": "whisper-large-v3-turbo-Q8_0.gguf", "size_mb": 886, "license": "MIT"},
+    {"name": "whisper-large-v3", "group": "s4", "hf_repo": "handy-computer/whisper-large-v3-gguf", "file": "whisper-large-v3-Q5_K_M.gguf", "size_mb": 1161, "license": "MIT"},
+    {"name": "qwen3-asr-0.6b", "group": "s4", "hf_repo": "handy-computer/Qwen3-ASR-0.6B-gguf", "file": "Qwen3-ASR-0.6B-Q8_0.gguf", "size_mb": 850, "license": "Apache-2.0"},
+    {"name": "qwen3-asr-1.7b", "group": "s4", "hf_repo": "handy-computer/Qwen3-ASR-1.7B-gguf", "file": "Qwen3-ASR-1.7B-Q5_K_M.gguf", "size_mb": 1517, "license": "Apache-2.0"},
+
+    {"name": "whisper.cpp-ggml", "group": "parity", "hf_repo": "ggerganov/whisper.cpp", "file": "ggml-large-v3-turbo-q5_0.bin", "size_mb": 574, "license": "MIT"}
+  ]
+}

@@ -1,0 +1,14 @@
+# Data lokal: model, korpus audio, hasil benchmark (jangan pernah di-commit)
+.data/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# OS / editor
+Thumbs.db
+.DS_Store
+.vscode/
+.idea/

@@ -14,7 +14,7 @@ Setiap risiko utama punya spike di dokumen 10.
 |---|---|---|---|---|---|
 | R-01 | **Kualitas STT Bahasa Indonesia dan code-switching** di bawah ekspektasi pada audio meeting nyata (bukan ucapan terbaca), terutama di tier hemat | Tinggi | Kritis | Korpus evaluasi sendiri sejak Fase 0; abstraksi engine (Whisper + Qwen3-ASR); mode bahasa per sesi; glosarium; re-transkripsi; opsi cloud BYOK | S4 |
 | R-02 | **Kecepatan final pass di CPU tanpa GPU** terlalu lambat (Whisper turbo sekitar 0,8x real time di CPU 2020) | Tinggi | Tinggi | Qwen3-ASR-0.6B/1.7B (sekitar 2 sampai 4x real time di CPU); final pass berjalan di background dan bisa dilanjutkan; estimasi waktu jujur; opsi cloud | S4 |
-| R-03 | **Izin audio macOS**: tidak ada API untuk cek izin tap; atribusi TCC untuk sidecar; perubahan perilaku di macOS 26; error mic `-10863` (prismical #21) | Sedang | Tinggi | Deteksi sunyi + panduan; uji dengan build Developer ID di macOS 14.2, 15, dan 26; helper Swift sebagai cadangan; uji mic AVAudioEngine dan HAL | S2 |
+| R-03 | *(Ditunda bersama port macOS, pasca-MVP)* **Izin audio macOS**: tidak ada API untuk cek izin tap; atribusi TCC untuk sidecar; perubahan perilaku di macOS 26; error mic `-10863` (prismical #21) | Sedang | Tinggi | Deteksi sunyi + panduan; uji dengan build Developer ID di macOS 14.2, 15, dan 26; helper Swift sebagai cadangan; uji mic AVAudioEngine dan HAL | S2 |
 | R-04 | **Windows process loopback** tidak tersedia atau tidak stabil di sebagian Windows 10 | Sedang | Sedang | Fallback otomatis ke endpoint loopback (dengan suara Recap sendiri dibisukan); probe saat onboarding | S1 |
 | R-05 | **Drift dan celah dua sumber audio** pada rekaman 2 sampai 3 jam (clock berbeda, loopback tanpa paket saat hening) | Tinggi | Sedang | Timestamp host per blok; isi celah; estimasi drift + resampler asinkron; file mentah tidak diubah | S1, S10 |
 | R-06 | **Gema** (pengguna tanpa headset) membuat transkrip ganda dan atribusi salah | Tinggi | Sedang | WebRTC AEC3 di jalur STT; deteksi gema + anjuran headset; dedup teks sebagai cadangan | S3 |
@@ -38,7 +38,7 @@ Setiap risiko utama punya spike di dokumen 10.
 | R-21 | **Kerapuhan yt-dlp** (sekitar 10 rilis dalam 8 bulan; butuh Deno dan PO token) | Tinggi | Rendah | Auto-update terpisah dari rilis aplikasi; pesan error yang jelas |
 | R-22 | **Penyalahgunaan untuk merekam diam-diam**; pengguna melanggar hukum consent | Sedang | Tinggi (reputasi) | Pengingat consent, template pesan, kebijakan penggunaan, indikator merekam, tanpa voiceprint default |
 | R-23 | **Code signing Windows** sulit untuk developer Indonesia (Azure tidak tersedia); SmartScreen menakuti pengguna | Tinggi | Sedang | SignPath Foundation (OSS); cadangan OV cloud HSM; Microsoft Store/winget; panduan instalasi |
-| R-24 | **Enroll Apple Developer** bermasalah (laporan nama tunggal dari Indonesia) | Rendah | Tinggi | Daftar sedini mungkin di Fase 0; dokumen identitas konsisten; opsi entitas organisasi |
+| R-24 | *(Ditunda bersama port macOS)* **Enroll Apple Developer** bermasalah (laporan nama tunggal dari Indonesia) | Rendah | Tinggi | Daftar beberapa bulan sebelum port macOS dimulai; dokumen identitas konsisten; opsi entitas organisasi |
 | R-25 | **Kapasitas developer solo paruh waktu**: lingkup terlalu besar, burnout, kurva belajar Rust/audio | Tinggi | Kritis | MVP ramping; spike dengan kriteria gagal yang jelas; potong fitur Beta bila jadwal mundur; reuse kode MIT; bantuan AI coding; batas waktu per spike (timebox) |
 | R-26 | **Pergeseran ekosistem cepat** (model dan runtime baru tiap bulan) | Tinggi | Rendah | Abstraksi engine/provider; katalog model terpisah dari rilis aplikasi |
 | R-27 | **Lisensi model berubah** atau model gated | Rendah | Sedang | Hanya model Apache-2.0/MIT sebagai default; manifest lisensi per model; tidak membundel model |
@@ -49,7 +49,7 @@ Setiap risiko utama punya spike di dokumen 10.
 
 1. **R-01/R-02: kualitas dan kecepatan STT Indonesia di laptop tanpa GPU.** Ini menentukan apakah produk layak.
 2. **R-25: kapasitas solo paruh waktu** dibanding lingkup lintas platform yang melibatkan audio native dan ML.
-3. **R-13/R-05/R-03: keandalan capture dua sumber** selama 2 sampai 3 jam, termasuk izin macOS.
+3. **R-13/R-05/R-08: keandalan capture dua sumber** selama 2 sampai 3 jam di Windows (drift, celah loopback, Bluetooth). Izin macOS (R-03) keluar dari jalur kritis karena MVP khusus Windows.
 
 ## 2. Strategi pengujian
 
@@ -83,9 +83,9 @@ Setiap risiko utama punya spike di dokumen 10.
 | Windows 10 22H2 x64, laptop 8 GB tanpa GPU (Intel gen 8 sampai 10 / Ryzen 3000 sampai 4000) | Tier hemat, process loopback, SmartScreen, NSIS |
 | Windows 11 24H2, iGPU Intel Xe / AMD 680M (Vulkan) | Tier standar, varian Vulkan, fallback CPU |
 | Windows 11 dengan GPU NVIDIA | Vulkan di dGPU, driver |
-| macOS 14.2 / 14.x (M1, 8 GB) | Batas minimum, izin tap, tier hemat Apple |
-| macOS 15 Sequoia (M2/M3 16 GB) | Tier standar Metal |
-| macOS 26 (M4) | Izin terbaru, mic `-10863`, startup |
+| *(Pasca-MVP)* macOS 14.2 / 14.x (M1, 8 GB) | Batas minimum, izin tap, tier hemat Apple |
+| *(Pasca-MVP)* macOS 15 Sequoia (M2/M3 16 GB) | Tier standar Metal |
+| *(Pasca-MVP)* macOS 26 (M4) | Izin terbaru, mic `-10863`, startup |
 | Linux (pasca-MVP): Ubuntu 24.04 PipeWire, Fedora | Monitor PipeWire, AppImage |
 
 **Skenario audio di setiap OS:**
@@ -113,7 +113,7 @@ Setiap risiko utama punya spike di dokumen 10.
 flowchart LR
   PR["Pull request"] --> L["Lint dan format: rustfmt, clippy, eslint, prettier"]
   L --> U["Unit + kontrak (Linux, cepat)"]
-  U --> B["Build matrix: windows-latest x64, macos-14 arm64"]
+  U --> B["Build: windows-latest x64 (macOS ditambah saat port)"]
   B --> I["Integrasi dengan model tiny + simulasi audio"]
   I --> A["Artefak unsigned untuk uji manual"]
   N["Nightly"] --> E["Eval subset korpus publik (FLEURS/AMI kecil)"]
@@ -140,7 +140,7 @@ flowchart LR
 | OS | Paket | Signing | Update |
 |---|---|---|---|
 | Windows | NSIS (per-user), nantinya MSIX/Store + winget | SignPath Foundation (OSS), cadangan OV cloud HSM | tauri-plugin-updater + `latest.json` |
-| macOS | DMG arm64 | Developer ID + Hardened Runtime + notarization + staple | tauri-plugin-updater |
+| macOS (pasca-MVP) | DMG arm64 | Developer ID + Hardened Runtime + notarization + staple | tauri-plugin-updater |
 | Linux (pasca-MVP) | AppImage, deb, lalu Flatpak | n/a (checksum + signature GPG di release) | AppImage update / repositori |
 
 **Kebijakan rilis:**

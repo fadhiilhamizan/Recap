@@ -2,6 +2,8 @@
 
 Dokumen ini menjabarkan arsitektur Recap berdasarkan keputusan di dokumen 04, terutama ADR-003 (model proses dan IPC).
 
+**Cakupan platform:** MVP khusus Windows (keputusan 2026-10-08). Bagian yang menyebut macOS adalah rancangan untuk port pasca-MVP, dipertahankan agar batas modul per OS sudah benar sejak awal.
+
 ## 1. Prinsip arsitektur
 
 1. **Disk dulu, proses kemudian.** Audio mentah ditulis ke disk per kanal sebelum diproses apa pun. Semua pemrosesan lain (draf live, final pass, ringkasan) bisa diulang dari disk.
@@ -391,7 +393,7 @@ Detail ada di dokumen 06.
 
 | Pertanyaan | Spike |
 |---|---|
-| Capture macOS: cidre atau helper Swift? Atribusi TCC untuk proses anak? | S2 |
+| Capture macOS: cidre atau helper Swift? Atribusi TCC untuk proses anak? | S2 (ditunda, pasca-MVP) |
 | Apakah AEC3 cukup untuk target duplikasi? | S3 |
 | Engine dan model final per tier? | S4 |
 | Latensi draf live yang realistis per tier? | S5 |

@@ -1,0 +1,13 @@
+# Tooling evaluasi Recap (spike S0/S4). Tidak ikut ke produk.
+# Versi dicek 2026-10-08.
+numpy==2.5.3
+jiwer==4.0.0          # Apache-2.0
+soundfile==0.14.0
+av==19.0.1            # PyAV, membundel FFmpeg (LGPL)
+onnxruntime==1.30.0   # Silero VAD
+psutil==7.2.2
+huggingface_hub==2.1.1
+scipy==1.18.1         # DER (Hungarian)
+tqdm==4.70.1
+transcribe-cpp==0.3.1 # MIT; menarik transcribe-cpp-native (CPU + Vulkan untuk Windows)
+pytest

@@ -13,18 +13,22 @@ Spike adalah eksperimen kecil ber-timebox untuk membuktikan asumsi berisiko sebe
 |---|---|---|---|---|---|
 | S0 | Persiapan: korpus evaluasi + harness metrik | 16 jam | n/a | n/a | Wajib, paling awal |
 | S1 | Capture Windows: process loopback + mic, dua track, 3 jam | 24 jam | n/a | 004, 007, 008 (sinkronisasi) | Wajib |
-| S2 | Capture macOS: Core Audio tap + mic, izin, sidecar | 24 jam | Mac + Apple Developer | 005, 003 | Wajib |
-| S3 | AEC WebRTC AEC3 dengan referensi system | 16 jam | S1 atau S2 | 008 | Wajib (hasil boleh "lulus bersyarat") |
+| S2 | Capture macOS: Core Audio tap + mic, izin, sidecar | 24 jam | Mac + Apple Developer | 005, 003 | **Ditunda** (pasca-MVP, keputusan 2026-10-08) |
+| S3 | AEC WebRTC AEC3 dengan referensi system | 16 jam | S1 | 008 | Wajib (hasil boleh "lulus bersyarat") |
 | S4 | Benchmark STT Indonesia/Inggris/campur (akurasi + kecepatan) | 32 jam | S0 | 009, 010 | Wajib, paling kritis |
 | S5 | Latensi draf live dan segmentasi VAD | 12 jam | S4 | 010, 011 | Wajib |
 | S6 | Kualitas ringkasan LLM lokal (JSON, bukti, Bahasa Indonesia) | 24 jam | S0 (transkrip), S4 opsional | 013, 014 | Wajib |
 | S7 | Diarization offline sherpa-onnx | 16 jam | S0 | 012 | Bisa ditunda ke awal Beta |
-| S8 | Kerangka Tauri + sidecar + packaging + signing + updater | 24 jam | Akun Apple, pendaftaran SignPath | 001, 003, 020 | Wajib |
+| S8 | Kerangka Tauri + sidecar + packaging + signing + updater (Windows) | 20 jam | Pendaftaran SignPath (atau sertifikat sementara) | 001, 003, 020 | Wajib |
 | S9 | Import file via ffmpeg LGPL (format beragam) | 6 jam | S8 | 018 | Wajib (kecil) |
-| S10 | Endurance 3 jam di mesin 8 GB (rekam + draf + memori) | 12 jam | S1/S2, S5 | 003, scheduler | Wajib |
+| S10 | Endurance 3 jam di mesin Windows 8 GB (rekam + draf + memori) | 12 jam | S1, S5 | 003, scheduler | Wajib |
 | S11 | Import URL yt-dlp + Deno on-demand | 8 jam | S9 | 017 | Sebelum Beta |
 
-**Total wajib (S0 sampai S6, S8 sampai S10):** sekitar 190 jam, atau sekitar 10 sampai 19 minggu kalender pada 10 sampai 20 jam per minggu. S7 dan S11 menyusul.
+**Pembaruan 2026-10-08:** MVP khusus Windows. S2 ditunda ke milestone R0 "Port macOS" (dokumen 08), dan semua spike lain hanya dijalankan di Windows.
+
+**Total wajib (S0, S1, S3 sampai S6, S8 sampai S10):** sekitar 166 jam, atau sekitar 8,5 sampai 17 minggu kalender pada 10 sampai 20 jam per minggu. S7 dan S11 menyusul.
+
+**Status (2026-10-08):** S0 dan S4 **dimulai**. Laporan berjalan ada di `docs/spikes/S0-S4.md`.
 
 **Urutan yang disarankan** (memaksimalkan informasi awal dan paralel secara logis):
 
@@ -35,14 +39,13 @@ flowchart LR
   S4 --> S5["S5 latensi live"]
   S1["S1 capture Windows"] --> S3["S3 AEC"]
   S1 --> S10["S10 endurance"]
-  S2["S2 capture macOS"] --> S10
   S5 --> S10
   S8["S8 kerangka Tauri + signing"] --> S9["S9 import ffmpeg"]
   S9 --> S11["S11 import URL"]
   S0 --> S7["S7 diarization"]
 ```
 
-**Gerbang go/no-go Fase 0 → MVP.** MVP dimulai bila S1, S2, S4, S6, dan S8 **lulus** (atau lulus bersyarat dengan mitigasi yang disepakati). Bila S4 gagal di tier hemat, lingkup produk disesuaikan (lihat bagian S4, "jika gagal") sebelum lanjut.
+**Gerbang go/no-go Fase 0 → MVP.** MVP dimulai bila S1, S4, S6, dan S8 **lulus** (atau lulus bersyarat dengan mitigasi yang disepakati). Bila S4 gagal di tier hemat, lingkup produk disesuaikan (lihat bagian S4, "jika gagal") sebelum lanjut.
 
 ---
 
@@ -77,7 +80,9 @@ flowchart LR
   - CPU proses capture di bawah 3% pada laptop uji.
 - **Gagal:** process loopback tidak tersedia di Windows 10 uji. Pakai endpoint loopback sebagai default di Windows 10 + bisukan suara Recap, dan dokumentasikan. Bila drift tak terkendali, rekam dengan clock tunggal (resample ke clock mic) dan uji ulang.
 
-## S2. Capture macOS
+## S2. Capture macOS (DITUNDA, pasca-MVP)
+
+Disimpan untuk port macOS nanti (milestone R0, dokumen 08). Tidak dijalankan di Fase 0.
 
 - **Tujuan:** membuktikan tap Core Audio + mic di macOS 14.2+ dari **sidecar** bertanda tangan, termasuk alur izin.
 - **Langkah:**
@@ -123,7 +128,7 @@ flowchart LR
   - **Perangkat:**
     - (A) laptop Windows 8 GB tanpa GPU, CPU sekitar 2019 sampai 2021
     - (B) Windows dengan iGPU (Vulkan)
-    - (C) Mac M1/M2 8 sampai 16 GB
+    - (C) Mac Apple Silicon: **ditunda** bersama port macOS
 - **Metrik:** WER, CER, CS-WER, kata halusinasi per menit hening, RTF, puncak RAM, keberhasilan GPU/fallback.
 - **Lulus:** ada konfigurasi per tier yang memenuhi:
   - **Hemat (A):** WER final ID-meeting 20% atau kurang, **dan** RTF final 0,5 atau kurang (3 jam selesai dalam 1,5 jam atau kurang), **dan** puncak RAM 3 GB atau kurang.
@@ -184,18 +189,18 @@ flowchart LR
 - **Tujuan:** menghilangkan risiko "tidak bisa dirilis" sejak awal.
 - **Langkah:**
   1. Workspace Tauri 2 + React. Satu sidecar dummy Rust yang berbicara `recap-protocol` (handshake, frame audio palsu, crash simulasi, supervisi).
-  2. CI build Windows x64 + macOS arm64.
-  3. Signing: Apple Developer ID + notarization; Windows via SignPath (atau self-signed sementara bila pendaftaran belum disetujui).
+  2. CI build Windows x64.
+  3. Signing Windows via SignPath (atau self-signed sementara bila pendaftaran belum disetujui).
   4. tauri-plugin-updater dari GitHub Releases (v0.0.1 → v0.0.2).
-  5. Uji instalasi di VM/mesin bersih Windows 10, Windows 11, dan macOS 14/26.
+  5. Uji instalasi di VM/mesin bersih Windows 10 dan Windows 11.
 - **Lulus:**
   - Installer berjalan di mesin bersih.
-  - Sidecar ter-sign dan spawn tanpa peringatan Gatekeeper.
+  - Sidecar ter-sign dan spawn tanpa diblokir Windows Defender / SmartScreen (di luar peringatan reputasi awal).
   - Update otomatis berhasil.
   - Ukuran installer di bawah 30 MB (tanpa ffmpeg dan model).
   - Startup 3 detik atau kurang.
   - Crash sidecar dipulihkan oleh supervisi.
-- **Gagal:** catat blokir (misalnya enroll Apple tertunda) dan jalankan paralel dengan build unsigned untuk uji internal. Rilis publik tertunda sampai signing beres.
+- **Gagal:** catat blokir (misalnya pendaftaran SignPath tertunda) dan jalankan paralel dengan build unsigned untuk uji internal. Rilis publik tertunda sampai signing beres.
 
 ## S9. Import file via ffmpeg
 

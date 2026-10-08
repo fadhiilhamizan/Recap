@@ -2,7 +2,7 @@
 
 ## 1. Ringkasan produk
 
-Recap adalah aplikasi desktop open source untuk Windows dan macOS (Linux menyusul) yang merekam dan memahami meeting, lalu menghasilkan catatan terstruktur:
+Recap adalah aplikasi desktop open source yang **MVP-nya khusus Windows** (keputusan 2026-10-08; macOS dan Linux menyusul setelah MVP), yang merekam dan memahami meeting, lalu menghasilkan catatan terstruktur:
 - transkrip bertimestamp per pembicara
 - ringkasan
 - poin penting
@@ -116,7 +116,7 @@ Prioritas: **M** = MVP, **B** = Beta, **L** = Later (rilis 1.0 atau setelahnya).
 
 | Area | MVP | Beta | Rilis 1.0 dan setelahnya |
 |---|---|---|---|
-| Platform | Windows 10 2004+/11 x64, macOS 14.2+ arm64 | Sama, plus perbaikan dari umpan balik | Linux (AppImage/deb, lalu Flatpak); macOS 13 via ScreenCaptureKit bila diminta |
+| Platform | Windows 10 2004+/11 x64 saja | Windows, plus perbaikan dari umpan balik | macOS 14.2+ arm64 (port, waktunya diputuskan setelah Beta); Linux (AppImage/deb, lalu Flatpak) |
 | Capture | Mic, system, keduanya; pilih device; level meter; jeda; pre-roll; recovery | AEC3 (bila belum lulus di MVP); bookmark | Deteksi meeting (saran) |
 | Import | File lokal via ffmpeg | Batch import; URL eksperimental | Watch folder |
 | STT | Draf live + final pass; mode bahasa; re-transkripsi; edit teks | Glosarium; timestamp kata; highlight saat playback | Kosakata otomatis |
@@ -177,5 +177,5 @@ Recap tidak memakai telemetri. Metrik diukur dari pengujian internal, beta teste
 - **Model:** Qwen3-ASR dan Qwen3.5 diasumsikan memberi kualitas Indonesia terbaik di ukuran kecil. Ini harus dibuktikan (S4, S6).
 - **Sumber daya developer:** solo paruh waktu. Roadmap (dokumen 08) memakai rentang waktu lebar, dan lingkup Beta bisa dipangkas.
 - **Nama produk** "Recap" perlu dicek ketersediaan merek dan domainnya (**perlu diverifikasi**).
-- **Biaya tahunan:** Apple Developer USD 99, plus mungkin sertifikat OV Windows bila SignPath belum menerima proyek.
+- **Biaya tahunan:** untuk MVP Windows, mungkin sertifikat OV bila SignPath belum menerima proyek. Apple Developer (USD 99/tahun) baru dibutuhkan saat port macOS.
 - **Kanal komunitas** untuk beta tester (Discord/Telegram/GitHub Discussions) belum ditentukan.

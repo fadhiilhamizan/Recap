@@ -55,6 +55,7 @@ flowchart LR
   J --> K["Beranda"]
 ```
 
+- **Cabang macOS** di diagram berlaku saat port pasca-MVP. MVP hanya Windows.
 - **Langkah F (uji system audio)** memutar nada pendek dan memeriksa apakah loopback/tap menangkapnya. Bila sunyi, tampilkan panduan per OS. Di macOS, tunjukkan cara membuka System Settings, Privacy & Security, Screen & System Audio Recording.
 - **Langkah H** menampilkan tier yang terdeteksi, misalnya: "Laptop Anda: 8 GB RAM, tanpa GPU, mode Hemat. Transkrip final 1 jam rapat sekitar 20 sampai 30 menit." Estimasi ini berasal dari benchmark mikro saat onboarding.
 - **Pengguna bisa melewati unduhan** dan memakai aplikasi untuk merekam saja. Pemrosesan akan menunggu model.

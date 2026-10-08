@@ -5,7 +5,7 @@ Setiap ADR memuat konteks, opsi, kriteria, perbandingan, keputusan, konsekuensi,
 ## Konteks yang mengikat (hasil klarifikasi 2026-10-08)
 
 - **Lisensi:** proyek open source.
-- **Target OS MVP:** Windows 10 2004+/11 x64 dan macOS 14.2+ Apple Silicon. Linux menyusul setelah MVP.
+- **Target OS MVP:** **Windows 10 2004+/11 x64 saja.** Pembaruan keputusan 2026-10-08: produk macOS tidak dibuat atau dijalankan dulu; fokus ke Windows. macOS (14.2+) dan Linux menyusul setelah MVP, waktunya diputuskan kemudian. Desain ADR macOS tetap disimpan agar arsitektur tidak menutup jalan port.
 - **Perangkat minimum:** RAM 8 GB tanpa GPU (mode hemat); 16 GB atau GPU disarankan.
 - **Stack:** Tauri 2 + Rust.
 - **Tim:** solo, paruh waktu.
@@ -33,7 +33,7 @@ Bobot kriteria ditulis dalam kurung, misalnya (3) berarti sangat penting.
 | 002 | Bahasa backend | Rust |
 | 003 | Model proses dan IPC | Proses utama + 3 sidecar Rust, IPC stdio berbingkai |
 | 004 | Capture audio Windows | WASAPI process loopback EXCLUDE (crate `wasapi`), fallback endpoint loopback |
-| 005 | Capture audio macOS | Core Audio process tap (cidre / Swift kecil), fallback ScreenCaptureKit (pasca-MVP) |
+| 005 | Capture audio macOS | **Ditunda (pasca-MVP).** Core Audio process tap (cidre / Swift kecil), fallback ScreenCaptureKit |
 | 006 | Capture audio Linux | PipeWire, fallback PulseAudio monitor (pasca-MVP) |
 | 007 | Format dan strategi penyimpanan audio | WAV 16-bit per kanal berchunk, flush 1 detik, lalu arsip Ogg Opus |
 | 008 | Echo cancellation dan sinkronisasi | WebRTC AEC3 di jalur STT, timestamp per buffer + resampler drift |
@@ -73,7 +73,7 @@ Versi dicek 2026-10-08: Tauri **v2.12.1** (2026-09-30), Tauri v3.0.0-alpha.4 (20
 **Keputusan:** Tauri 2 (rilis 2.x terbaru). Tauri v3 tidak dipakai sampai stabil, tetapi patut dipantau karena runtime CEF opsional bisa menghilangkan perbedaan WebView.
 
 **Konsekuensi:**
-- Harus menguji UI di WebView2 dan WKWebView. Linux (WebKitGTK) paling lemah dan baru dikerjakan pasca-MVP.
+- MVP hanya perlu diuji di WebView2 (Windows). WKWebView (macOS) dan WebKitGTK (Linux, paling lemah) baru diuji saat port pasca-MVP. Tauri dipertahankan karena tetap membuka jalan port tersebut.
 - Bergantung pada Rust; kurva belajar menjadi risiko jadwal untuk developer solo (lihat dokumen 09).
 
 **Validasi:** spike S8 (kerangka aplikasi + sidecar + packaging).
@@ -134,7 +134,7 @@ Versi dicek 2026-10-08: Tauri **v2.12.1** (2026-09-30), Tauri v3.0.0-alpha.4 (20
 - **Supervisi:** proses utama me-restart sidecar dengan backoff eksponensial, maksimal 5 kali per sesi (pola prismical `RESTART_SCHEDULE`), dan memakai circuit breaker per rekaman untuk ASR.
 
 **Konsekuensi:**
-- Ada empat binary yang harus di-sign dan dinotarisasi. Di macOS, `NSMicrophoneUsageDescription` dan `NSAudioCaptureUsageDescription` dipasang di bundle aplikasi. Atribusi izin TCC untuk proses anak perlu diuji di spike S2 (**perlu diverifikasi**, walau prismical membuktikan pola ini berjalan dengan helper Swift).
+- Ada empat binary yang harus di-sign (MVP: Authenticode Windows). Saat port macOS nanti, semuanya juga harus dinotarisasi, dan `NSMicrophoneUsageDescription` dan `NSAudioCaptureUsageDescription` dipasang di bundle aplikasi. Atribusi izin TCC untuk proses anak perlu diuji di spike S2 (**perlu diverifikasi**, walau prismical membuktikan pola ini berjalan dengan helper Swift).
 - Audio live harus dikirim dari capture ke ASR (lihat dokumen 03).
 
 ---
@@ -165,6 +165,8 @@ Crate: `wasapi` **0.25.0** (HEnquist, MIT, 2026-10-01) mendukung endpoint loopba
 ---
 
 ## ADR-005: Capture audio macOS
+
+**Status: Ditunda (pasca-MVP)** sesuai keputusan 2026-10-08. Isi di bawah disimpan sebagai rancangan untuk port macOS nanti; spike S2 ikut ditunda.
 
 | Kriteria (bobot) | A. Core Audio process tap (14.2+) | B. ScreenCaptureKit audio (13+) | C. Driver virtual (BlackHole) |
 |---|---|---|---|
@@ -272,7 +274,7 @@ Keduanya akan dicoba di spike S2. Kecenderungan awal adalah `cidre`, agar tetap 
 - **Bila lulus S4:** B (transcribe.cpp) ditambahkan sebagai engine untuk Qwen3-ASR, dan menjadi default final pass bila menang di korpus Indonesia.
 - C dipakai untuk diarization dan embedding speaker (ADR-012), bukan untuk ASR utama.
 - **Build:**
-  - Varian CPU portabel (`GGML_NATIVE OFF`, dispatch CPU runtime) + Vulkan untuk Windows, Metal untuk macOS.
+  - Varian CPU portabel (`GGML_NATIVE OFF`, dispatch CPU runtime) + Vulkan untuk Windows. Metal untuk macOS saat port pasca-MVP.
   - Proses utama memilih binary `recap-asr` yang sesuai setelah probe GPU.
   - Bila varian GPU gagal dimuat, fallback ke CPU (pelajaran meetily #685).
 
@@ -285,8 +287,8 @@ Angka kecepatan berasal dari satu sumber (benchmark Handy, Ryzen 4750U, dicek 20
 | Tier | Ciri | Draf live | Final pass | Catatan |
 |---|---|---|---|---|
 | **Hemat** | RAM 8 GB, tanpa GPU | Qwen3-ASR-0.6B (sekitar 4,3x real time di CPU), atau Whisper small q5; boleh dimatikan | Qwen3-ASR-0.6B atau 1.7B (sekitar 2x real time di CPU) | Whisper large-v3-turbo di CPU sekitar 0,8x real time, sehingga final pass 3 jam butuh hampir 4 jam. **Tidak layak** di tier ini |
-| **Standar** | RAM 16 GB, iGPU (Vulkan/Metal) | Whisper small/medium q5 di GPU, atau Qwen3-ASR-0.6B | Qwen3-ASR-1.7B atau Whisper large-v3-turbo q5/q8 di GPU (sekitar 3,4x real time di iGPU) | |
-| **Kuat** | Apple Silicon 16 GB+ atau GPU diskrit | Whisper large-v3-turbo atau Qwen3-ASR-1.7B | Whisper large-v3 / Qwen3-ASR-1.7B | |
+| **Standar** | RAM 16 GB, iGPU (Vulkan) | Whisper small/medium q5 di GPU, atau Qwen3-ASR-0.6B | Qwen3-ASR-1.7B atau Whisper large-v3-turbo q5/q8 di GPU (sekitar 3,4x real time di iGPU) | |
+| **Kuat** | GPU diskrit (NVIDIA/AMD via Vulkan) dan RAM 16 GB+ (Apple Silicon masuk tier ini saat port macOS) | Whisper large-v3-turbo atau Qwen3-ASR-1.7B | Whisper large-v3 / Qwen3-ASR-1.7B | |
 
 **Keputusan:** Tier ditentukan otomatis lewat probe hardware saat onboarding, dan bisa diubah pengguna. Model diunduh saat dibutuhkan dengan pin SHA-256. Tabel di atas adalah **hipotesis**; pilihan final mengikuti hasil spike S4.
 
@@ -464,9 +466,9 @@ Data skor dari leaderboard SEA-HELM tanggal 2026-09-18. Angkanya diparsing dari 
 | Area | Keputusan |
 |---|---|
 | Installer Windows | NSIS (per-user, bisa pilih folder). MSIX/Microsoft Store dan winget menyusul di rilis publik |
-| Installer macOS | DMG, arm64. Intel tidak didukung resmi |
+| Installer macOS | **Pasca-MVP.** DMG, arm64. Intel tidak didukung resmi |
 | Linux (pasca-MVP) | AppImage + deb, lalu Flatpak |
-| Signing macOS | Apple Developer Program (USD 99/tahun), Developer ID + Hardened Runtime + notarization. Entitlement `com.apple.security.device.audio-input`; `NSMicrophoneUsageDescription` dan `NSAudioCaptureUsageDescription` di Info.plist (ditulis manual) |
+| Signing macOS | **Pasca-MVP; pendaftaran Apple Developer tidak dibutuhkan sekarang.** Apple Developer Program (USD 99/tahun), Developer ID + Hardened Runtime + notarization. Entitlement `com.apple.security.device.audio-input`; `NSMicrophoneUsageDescription` dan `NSAudioCaptureUsageDescription` di Info.plist (ditulis manual) |
 | Signing Windows | **SignPath Foundation** (gratis untuk OSS; daftar setelah repo publik dan punya rilis). Cadangan: sertifikat OV dengan cloud HSM (sekitar USD 150 sampai 300/tahun). Azure Artifact Signing **tidak tersedia** untuk Indonesia (dicek 2026-10-08) |
 | Update aplikasi | `tauri-plugin-updater` + `latest.json` di GitHub Releases, ditandatangani minisign. Kanal stable dan beta |
 | Update model | Katalog model (JSON bertanda tangan) terpisah dari rilis aplikasi. Unduhan bisa dilanjutkan, dengan SHA-256 |
@@ -535,7 +537,7 @@ Data skor dari leaderboard SEA-HELM tanggal 2026-09-18. Angkanya diparsing dari 
 | ADR | Spike |
 |---|---|
 | 004 | S1 |
-| 005 | S2 |
+| 005 | S2 (ditunda) |
 | 008 | S3 |
 | 009/010 | S4, S5 |
 | 012 | S7 |
