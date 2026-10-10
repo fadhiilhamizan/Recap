@@ -124,7 +124,8 @@ class WhisperCppCliEngine(Engine):
     def transcribe(self, pcm, language, prompt=None):
         wav = self.tmp / "seg.wav"
         save_wav(wav, pcm)
-        cmd = [str(self.exe), "-m", str(self.model_path), "-f", str(wav), "-nt", "-np", "-otxt", "-of", str(self.tmp / "out")]
+        # Jangan pakai -np: opsi itu juga menyembunyikan whisper_print_timings yang dipakai untuk RTF.
+        cmd = [str(self.exe), "-m", str(self.model_path), "-f", str(wav), "-nt", "-otxt", "-of", str(self.tmp / "out")]
         if self.spec.threads:
             cmd += ["-t", str(self.spec.threads)]
         cmd += ["-l", language if (self.spec.language_mode == "fixed" and language) else "auto"]

@@ -1,5 +1,8 @@
 """Jalankan seluruh matriks engine (satu proses per konfigurasi) lalu tulis laporan.
 
+Konfigurasi yang sudah punya ``metrics.json`` dilewati; run yang terputus dilanjutkan
+(``--fresh`` untuk mengulang semuanya).
+
   python scripts/run_matrix.py --manifest ../../.data/corpus/fleurs-id/manifest.jsonl --limit 50
   python scripts/run_matrix.py --manifest ... --only qwen3-0.6b-q8-cpu4,whisper-turbo-q5-vk
 
@@ -28,6 +31,7 @@ def main(argv=None) -> int:
     ap.add_argument("--sets", default="")
     ap.add_argument("--tag", default="")
     ap.add_argument("--mode", default="auto")
+    ap.add_argument("--fresh", action="store_true", help="jangan lewati/lanjutkan run sebelumnya")
     args = ap.parse_args(argv)
 
     engines = json.loads(args.matrix.read_text(encoding="utf-8"))["engines"]
@@ -39,8 +43,20 @@ def main(argv=None) -> int:
         if not (DATA / "models" / spec["model"]).exists():
             print(f"LEWATI {spec['name']}: model {spec['model']} belum diunduh")
             continue
+        suffix = spec["name"] + (f"-{args.tag}" if args.tag else "")
+        previous = sorted(d for d in (DATA / "results").glob("*") if d.is_dir() and d.name[16:] == suffix)
+        resume = None
+        if previous and not args.fresh:
+            last = previous[-1]
+            if (last / "metrics.json").exists():
+                print(f"SUDAH SELESAI {spec['name']}: {last.name}", flush=True)
+                continue
+            if (last / "hyp.jsonl").exists():
+                resume = last
         cmd = [sys.executable, "-m", "recap_eval.bench", "--manifest", str(args.manifest),
                "--engine-json", json.dumps(spec), "--mode", args.mode]
+        if resume:
+            cmd += ["--resume", str(resume)]
         if args.limit:
             cmd += ["--limit", str(args.limit)]
         if args.sets:

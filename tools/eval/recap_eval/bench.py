@@ -58,6 +58,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--sets", default="", help="filter set, dipisah koma")
     ap.add_argument("--out", type=Path, default=DATA / "results")
     ap.add_argument("--tag", default="", help="label tambahan untuk run (misalnya nama mesin)")
+    ap.add_argument("--resume", type=Path, help="folder run yang terputus; item yang sudah ada di hyp.jsonl dilewati")
     args = ap.parse_args(argv)
 
     spec_dict = json.loads(args.engine_json) if args.engine_json else json.loads(args.engine_file.read_text(encoding="utf-8"))
@@ -73,9 +74,25 @@ def main(argv: list[str] | None = None) -> int:
         print("Tidak ada item untuk dijalankan.", file=sys.stderr)
         return 2
 
-    run_id = f"{datetime.now():%Y%m%d-%H%M%S}-{spec.name}" + (f"-{args.tag}" if args.tag else "")
-    out_dir = args.out / run_id
+    if args.resume:
+        out_dir = args.resume
+        run_id = out_dir.name
+    else:
+        run_id = f"{datetime.now():%Y%m%d-%H%M%S}-{spec.name}" + (f"-{args.tag}" if args.tag else "")
+        out_dir = args.out / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    # Baris yang sudah selesai pada run terputus: dipakai ulang apa adanya.
+    done: dict[str, dict] = {}
+    hyp_path = out_dir / "hyp.jsonl"
+    if args.resume and hyp_path.exists():
+        for line in hyp_path.read_text(encoding="utf-8").splitlines():
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError:
+                break  # baris terakhir terpotong saat proses mati
+            done[row["id"]] = row
+        print(f"[{spec.name}] melanjutkan: {len(done)} item sudah selesai", flush=True)
 
     vad = None
     vad_params = VadParams.live() if args.vad_profile == "live" else VadParams()
@@ -92,8 +109,19 @@ def main(argv: list[str] | None = None) -> int:
     notes: set[str] = set()
     t_start = time.perf_counter()
 
-    with (out_dir / "hyp.jsonl").open("w", encoding="utf-8") as hyp_fh:
+    with hyp_path.open("w", encoding="utf-8") as hyp_fh:
         for n, it in enumerate(items, 1):
+            if it.id in done:
+                row = done[it.id]
+                if it.ref is not None:
+                    silence_min = row["dur_s"] / 60 if it.set == "silence" else 0.0
+                    counts = score_item(it.ref, row["hyp"], silence_minutes=silence_min)
+                    totals.add(counts)
+                    per_set[it.set].add(counts)
+                total_audio += row["dur_s"]
+                total_proc += row["proc_s"]
+                hyp_fh.write(json.dumps(row, ensure_ascii=False) + "\n")
+                continue
             pcm = load_audio(it.audio)
             dur = duration_s(pcm)
             use_vad = args.mode == "vad" or (args.mode == "auto" and it.kind == "longform")
@@ -127,6 +155,7 @@ def main(argv: list[str] | None = None) -> int:
                 "rtf": round(proc / dur, 4) if dur else None, "hyp": hyp, "ref": it.ref,
                 "segments": seg_out if use_vad else None,
             }, ensure_ascii=False) + "\n")
+            hyp_fh.flush()  # agar item yang selesai tidak hilang bila proses mati
             if n % 10 == 0 or n == len(items):
                 wer = totals.wer
                 print(f"[{spec.name}] {n}/{len(items)}  WER sementara {wer:.3f}" if wer is not None else f"[{spec.name}] {n}/{len(items)}", flush=True)
@@ -153,7 +182,7 @@ def main(argv: list[str] | None = None) -> int:
         "speed_x_realtime": round(total_audio / total_proc, 2) if total_proc else None,
         "peak_mem_mb": round(peak_bytes / 2**20),
         "wall_s": round(time.perf_counter() - t_start, 1),
-        "notes": sorted(notes),
+        "notes": sorted(notes) + ([f"resumed: {len(done)} item dari run sebelumnya; wall_s hanya bagian lanjutan"] if done else []),
         "metrics": totals.as_dict(),
         "metrics_per_set": {k: v.as_dict() for k, v in sorted(per_set.items())},
     }
