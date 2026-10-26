@@ -28,7 +28,17 @@ Spike adalah eksperimen kecil ber-timebox untuk membuktikan asumsi berisiko sebe
 
 **Total wajib (S0, S1, S3 sampai S6, S8 sampai S10):** sekitar 166 jam, atau sekitar 8,5 sampai 17 minggu kalender pada 10 sampai 20 jam per minggu. S7 dan S11 menyusul.
 
-**Status (2026-10-08):** S0 dan S4 **dimulai**. Laporan berjalan ada di `docs/spikes/S0-S4.md`.
+**Status (diperbarui 2026-10-26):**
+
+| Spike | Status | Laporan |
+|---|---|---|
+| S0 | Harness selesai; korpus meeting nyata menunggu rekaman | `docs/spikes/S0-S4.md`, `S0-panduan-korpus.md` |
+| S4 | Lulus bersyarat (FLEURS); tahap 2 menunggu korpus meeting | `docs/spikes/S0-S4.md` |
+| S5 | Lulus (indikatif, FLEURS long-form) | `docs/spikes/S5-latensi-live.md` |
+| S1 | Lulus bersyarat; tes manual T1 sampai T3 tertunda | `docs/spikes/S1-capture-windows.md` |
+| S8 | Lulus, kecuali signing (menunggu SignPath) | `docs/spikes/S8-kerangka-tauri.md` |
+| S9 | Lulus 16/16 | `docs/spikes/S9-ffmpeg.md` |
+| S3, S6, S7, S10, S11 | Belum | n/a |
 
 **Urutan yang disarankan** (memaksimalkan informasi awal dan paralel secara logis):
 

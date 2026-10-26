@@ -12,6 +12,7 @@
     {"name": "qwen3-asr-0.6b", "group": "s4", "hf_repo": "handy-computer/Qwen3-ASR-0.6B-gguf", "file": "Qwen3-ASR-0.6B-Q8_0.gguf", "size_mb": 850, "license": "Apache-2.0"},
     {"name": "qwen3-asr-1.7b", "group": "s4", "hf_repo": "handy-computer/Qwen3-ASR-1.7B-gguf", "file": "Qwen3-ASR-1.7B-Q5_K_M.gguf", "size_mb": 1517, "license": "Apache-2.0"},
 
+    {"name": "ffmpeg-lgpl", "group": "s9", "url": "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n9.0-latest-win64-lgpl-shared-9.0.zip", "file": "ffmpeg-n9.0-latest-win64-lgpl-shared-9.0.zip", "unzip_to": "bin/ffmpeg", "unzip_check": "ffmpeg.exe", "size_mb": 73, "license": "LGPL-3.0-or-later (karena --enable-version3 untuk opencore-amr)"},
     {"name": "whisper.cpp-ggml", "group": "parity", "hf_repo": "ggerganov/whisper.cpp", "file": "ggml-large-v3-turbo-q5_0.bin", "size_mb": 574, "license": "MIT"}
   ]
 }

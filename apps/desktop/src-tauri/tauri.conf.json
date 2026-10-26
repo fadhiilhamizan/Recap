@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Recap Dev",
+  "version": "0.0.1",
+  "identifier": "id.recap.dev",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [{ "title": "Recap", "width": 960, "height": 680, "minWidth": 640, "minHeight": 480 }],
+    "security": {
+      "csp": "default-src 'self'; connect-src ipc: http://ipc.localhost; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "createUpdaterArtifacts": true,
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.ico"],
+    "externalBin": ["binaries/recap-dummy-sidecar"],
+    "windows": {
+      "nsis": { "installMode": "currentUser" }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEQ3N0RFRUVCQjI2RjNCRjEKUldUeE8yK3k2KzU5MXpSekdtci96N1dmQVFFem5rUFlncEhpS0ltQVJwT252MXQyMFB2WVp0dHIK",
+      "endpoints": ["http://127.0.0.1:8777/latest.json"],
+      "dangerousInsecureTransportProtocol": true,
+      "windows": { "installMode": "passive" }
+    }
+  }
+}

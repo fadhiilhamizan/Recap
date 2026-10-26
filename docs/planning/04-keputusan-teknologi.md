@@ -124,7 +124,7 @@ Versi dicek 2026-10-08: Tauri **v2.12.1** (2026-09-30), Tauri v3.0.0-alpha.4 (20
 **Desain IPC:**
 - **UI ↔ proses utama:**
   - Tauri commands (request/response) dan Tauri events/Channel (stream: level meter, segmen live, progres job).
-  - Tipe TypeScript dihasilkan otomatis dengan `tauri-specta` (v1.0.2, MIT, dicek 2026-10-08) agar kontrak tidak menyimpang.
+  - Tipe TypeScript dihasilkan otomatis dengan `tauri-specta` agar kontrak tidak menyimpang. **Koreksi 2026-10-26:** versi 1.0.2 yang semula dicantumkan hanya untuk Tauri 1; untuk Tauri 2 versinya **2.0.0-rc.26** (pre-release, MIT), dipin persis dan sudah terbukti berjalan di spike S8. Risiko API berubah sebelum 2.0 stabil dicatat; fallback-nya menulis tipe TS manual plus contract test.
   - UI **tidak pernah** memegang data primer.
 - **Proses utama ↔ sidecar:** stdin/stdout dengan frame berprefiks panjang:
   - **JSON control:** perintah, event, dan error. Setiap pesan punya `id`, `type`, dan `v` (versi protokol).

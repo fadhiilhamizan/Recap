@@ -1,0 +1,37 @@
+[package]
+name = "recap-app"
+description = "Recap: proses utama (Tauri 2)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+default-run = "recap-app"
+
+# Generator binding TypeScript: hanya dibangun dengan `--features bindgen`, sehingga tidak ikut
+# dibundel ke installer (bundler Tauri menyertakan semua biner paket yang dibangun).
+[[bin]]
+name = "export-bindings"
+path = "src/bin/export_bindings.rs"
+required-features = ["bindgen"]
+
+[features]
+bindgen = []
+
+[lib]
+name = "recap_app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.7", features = [] }
+
+[dependencies]
+tauri = { version = "2.12", features = [] }
+tauri-plugin-updater = "2.14"
+tauri-plugin-process = "2.4"
+serde.workspace = true
+serde_json.workspace = true
+recap-sidecar = { path = "../../../crates/recap-sidecar" }
+# tauri-specta untuk Tauri 2 masih pre-release (dicek 2026-10-26); versi dipin persis.
+specta = { version = "=2.0.0-rc.26", features = ["derive"] }
+tauri-specta = { version = "=2.0.0-rc.26", features = ["derive", "typescript"] }
+specta-typescript = "0.0.13"

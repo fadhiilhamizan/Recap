@@ -120,7 +120,7 @@ def fetch_url(item: dict, lock: dict) -> None:
                  "license": item.get("license")}
     if item.get("unzip_to"):
         out = DATA / item["unzip_to"]
-        if not (out / "whisper-cli.exe").exists():
+        if not (out / item.get("unzip_check", "whisper-cli.exe")).exists():
             out.mkdir(parents=True, exist_ok=True)
             with zipfile.ZipFile(dest) as zf:
                 for member in zf.infolist():

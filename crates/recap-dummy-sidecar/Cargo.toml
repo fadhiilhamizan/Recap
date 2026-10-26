@@ -1,0 +1,10 @@
+[package]
+name = "recap-dummy-sidecar"
+description = "Sidecar tiruan untuk spike S8: handshake, ping/pong, frame audio palsu, crash/macet sesuai perintah"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+recap-sidecar = { path = "../recap-sidecar" }

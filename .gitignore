@@ -1,6 +1,15 @@
 # Data lokal: model, korpus audio, hasil benchmark (jangan pernah di-commit)
 .data/
 
+# Rust
+target/
+
+# Frontend / Tauri (artefak build)
+node_modules/
+apps/desktop/dist/
+apps/desktop/src-tauri/binaries/
+apps/desktop/src-tauri/gen/
+
 # Python
 .venv/
 __pycache__/
